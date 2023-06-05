@@ -14,8 +14,8 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/perrich/Hangfire.MemoryStorage</RepositoryUrl>
     <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
-    <Version>1.7.0</Version>
-    <AssemblyVersion>1.7.0.0</AssemblyVersion>
+    <Version>1.7.0.1</Version>
+    <AssemblyVersion>1.7.0.1</AssemblyVersion>
   </PropertyGroup>
 
   <ItemGroup>
