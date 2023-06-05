@@ -5,6 +5,7 @@ using System.Threading;
 using Hangfire.Common;
 using Hangfire.MemoryStorage.Database;
 using Hangfire.MemoryStorage.Dto;
+using Hangfire.MemoryStorage.Entities;
 using Hangfire.MemoryStorage.Utilities;
 using Hangfire.Server;
 using Hangfire.Storage;
@@ -40,10 +41,10 @@ namespace Hangfire.MemoryStorage
                 Id = serverId
             });
 
-            var data = new
+            var data = new ServerData
             {
-                context.WorkerCount,
-                context.Queues,
+                WorkerCount = context.WorkerCount,
+                Queues = context.Queues,
                 StartedAt = DateTime.UtcNow
             };
 
@@ -74,7 +75,7 @@ namespace Hangfire.MemoryStorage
             {
                 var list = parameters.Select(kvp => new JobParameterDto
                 {
-                    Id = AutoIncrementIdGenerator.GenerateId(typeof (JobParameterDto)),
+                    Id = AutoIncrementIdGenerator.GenerateId(typeof(JobParameterDto)),
                     JobId = jobData.Id,
                     Name = kvp.Key,
                     Value = kvp.Value
@@ -110,10 +111,10 @@ namespace Hangfire.MemoryStorage
                     foreach (var qName in queues)
                     {
                         queue = (from q in jobQueues
-                                 where q.Queue == qName
-                                       && (!q.FetchedAt.HasValue || q.FetchedAt.Value < timeout)
-                                 orderby q.AddedAt descending
-                                 select q).FirstOrDefault();
+                            where q.Queue == qName
+                                  && (!q.FetchedAt.HasValue || q.FetchedAt.Value < timeout)
+                            orderby q.AddedAt descending
+                            select q).FirstOrDefault();
                         if (queue != null)
                             break;
                     }
@@ -125,7 +126,7 @@ namespace Hangfire.MemoryStorage
                     }
                 }
 
-                WaitHandle.WaitAny(new[] { cancellationToken.WaitHandle, NewItemInQueueEvent }, TimeSpan.FromSeconds(15));
+                WaitHandle.WaitAny(new[] {cancellationToken.WaitHandle, NewItemInQueueEvent}, TimeSpan.FromSeconds(15));
                 cancellationToken.ThrowIfCancellationRequested();
             }
 
@@ -179,7 +180,8 @@ namespace Hangfire.MemoryStorage
                 return null;
             }
 
-            var invocationData = SerializationHelper.Deserialize<InvocationData>(jobData.InvocationData, SerializationOption.User);
+            var invocationData =
+                SerializationHelper.Deserialize<InvocationData>(jobData.InvocationData, SerializationOption.User);
 
             invocationData.Arguments = jobData.Arguments;
 
@@ -216,7 +218,7 @@ namespace Hangfire.MemoryStorage
             }
 
             var parameter = jobData.Parameters.Where(p => p.Name == name).FirstOrDefault();
-            
+
             return parameter == null ? null : parameter.Value;
         }
 
@@ -250,7 +252,8 @@ namespace Hangfire.MemoryStorage
                 Name = jobData.State.Name,
                 Reason = jobData.State.Reason,
                 Data = new Dictionary<string, string>(
-                    SerializationHelper.Deserialize<Dictionary<string, string>>(jobData.State.Data, SerializationOption.User),
+                    SerializationHelper.Deserialize<Dictionary<string, string>>(jobData.State.Data,
+                        SerializationOption.User),
                     StringComparer.OrdinalIgnoreCase)
             };
         }
@@ -384,7 +387,7 @@ namespace Hangfire.MemoryStorage
             {
                 parameter = new JobParameterDto
                 {
-                    Id = AutoIncrementIdGenerator.GenerateId(typeof (JobParameterDto)),
+                    Id = AutoIncrementIdGenerator.GenerateId(typeof(JobParameterDto)),
                     JobId = id,
                     Name = name
                 };
@@ -407,7 +410,7 @@ namespace Hangfire.MemoryStorage
                 {
                     hash = new HashDto
                     {
-                        Id = AutoIncrementIdGenerator.GenerateId(typeof (HashDto)),
+                        Id = AutoIncrementIdGenerator.GenerateId(typeof(HashDto)),
                         Key = key,
                         Field = kvp.Key
                     };
